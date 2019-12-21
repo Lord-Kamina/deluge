@@ -5,6 +5,8 @@
 # the additional special exception to link portions of this program with the OpenSSL library.
 # See LICENSE for more details.
 #
+from gi import require_version
+require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from deluge.configmanager import ConfigManager
