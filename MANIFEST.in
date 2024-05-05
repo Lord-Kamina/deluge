@@ -25,6 +25,8 @@ graft deluge/ui/data
 recursive-exclude deluge/ui/data *.desktop *.xml
 graft deluge/ui/gtk3/glade
 
+prune build
+
 include deluge/ui/web/index.html
 include deluge/ui/web/css/*.css
 include deluge/ui/web/js/*.js

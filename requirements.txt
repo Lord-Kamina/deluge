@@ -1,7 +1,10 @@
 libtorrent
 twisted[tls]>=17.1
+# Add pyasn1 for setuptools workaround: https://github.com/pypa/setuptools/issues/1510
+pyasn1
 rencode
 pyopenssl
+pygobject
 pyxdg
 pillow
 pillow<=9; python_version=="3.7"
