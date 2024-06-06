@@ -282,25 +282,17 @@ class BuildPlugins(Command):
         for path in glob.glob(plugin_path):
             if os.path.exists(os.path.join(path, 'setup.py')):
                 if self.develop and self.install_dir:
-                    os.system(
-                        'cd '
-                        + path
-                        + '&& '
-                        + sys.executable
-                        + ' setup.py develop --install-dir=%s' % self.install_dir
-                    )
+                    os.system(f"cd {path} && {sys.executable} setup.py develop --install-dir={self.install_dir}")
+#                     os.system(f"cd {path} && {sys.executable} -m pip install --editable . --prefix={self.install_dir}")
+#                     Command to use when moving to pyproject.toml
                 elif self.develop:
-                    os.system(
-                        'cd ' + path + '&& ' + sys.executable + ' setup.py develop'
-                    )
+                	os.system(f"cd {path} && {sys.executable} setup.py develop")
+#                     os.system(f"cd {path} && {sys.executable} -m pip install --editable .")
+#                    Command to use when moving to pyproject.toml
                 else:
-                    os.system(
-                        'cd '
-                        + path
-                        + '&& '
-                        + sys.executable
-                        + ' setup.py bdist_egg -d ..'
-                    )
+                    os.system(f"cd {path} && {sys.executable} setup.py bdist_wheel -d ..")
+#                     os.system(f"cd {path} && {sys.executable} -m build . -o ..")
+#                     Command to use when moving to pyproject.toml
 
 
 class CleanPlugins(Command):

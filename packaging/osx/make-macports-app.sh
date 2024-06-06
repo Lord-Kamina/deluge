@@ -1,5 +1,4 @@
-#!/bin/bash
-set -o errexit
+#!/bin/bash -Ex
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "${SOURCE}" ]
@@ -10,10 +9,7 @@ while [ -h "${SOURCE}" ]
     done
 CURRDIR="$( cd -P "$( dirname "$SOURCE" )" && cd ../.. && pwd )"
 
-if [ -z "${BUILDDIR}" ]; then
-export BUILDDIR="${CURRDIR}/py2app-build/"
-fi
-
+test -z "${BUILDDIR}" && export BUILDDIR="${CURRDIR}/py2app-build/"
 
 APPDIR="./app/Deluge.app"
 RSCDIR="${APPDIR}/Contents/Resources"
@@ -25,9 +21,7 @@ export DELUGEDIR=$(cd ../../ && pwd)
 
 echo "DELUGEDIR: ${DELUGEDIR}"
 
-if [ -z "${PY2APP_PREFIX}" ]; then
-export PY2APP_PREFIX="${BUILDDIR}/app/deluge.app/Contents/"
-fi
+test -z "${PY2APP_PREFIX}" && export PY2APP_PREFIX="${BUILDDIR}/app/deluge.app/Contents/"
 
 
 function msg() { echo "==> $1"; }
@@ -41,15 +35,19 @@ msg "Clearing app dir"
 rm -fr $APPDIR
 
 pushd ../../
-python3 setup.py clean --all
-find ./ \( -name '__pycache__' -or -name 'build' \) -type d -ls -depth -delete
+# python3 -V
+# python3 setup.py clean --all
+# find ./ \( -name '__pycache__' -or -name 'build' \) -type d -ls -depth -delete
 msg "Running build"
 msg "Creating app skeleton"
-python3 setup.py py2app --verbose --dist-dir "${BUILDDIR}/app" --no-strip --graph --xref  --use-faulthandler --verbose-interpreter 
+# python3 setup.py py2app --verbose --dist-dir "${BUILDDIR}/app" --no-strip --graph --xref  --use-faulthandler --verbose-interpreter 
 msg "Creating Wheel"
-python3 setup.py bdist_wheel --dist-dir "${BUILDDIR}/wheel"
-rm -fv "${BUILDDIR}/app/deluge.app/Contents/MacOS/deluge"
-python3 setup.py install_scripts --install-dir "${BUILDDIR}/app/deluge.app/Contents/MacOS/"
+sed -e s/%VERSION%/$VERSION/ -e s/%YEAR%/$YEAR/ "${DELUGEDIR}/packaging/osx/Info.plist.in" > "${DELUGEDIR}/packaging/osx/Info.plist"
+python3 -m py2app --pyproject-toml="${DELUGEDIR}/pyproject.toml"
+exit
+# python3 -m build --outdir "${BUILDDIR}/wheel"
+# rm -fv "${BUILDDIR}/app/deluge.app/Contents/MacOS/deluge"
+# python3 setup.py install_scripts --install-dir "${BUILDDIR}/app/deluge.app/Contents/MacOS/"
 popd
 
 export PY2APP_PYTHON_VERSION=$("${PY2APP_PREFIX}/MacOS/python" --version | sed 's|Python ||' | cut -f 1,2 -d '.')
@@ -57,9 +55,11 @@ export PY2APP_PYTHON_VERSION=$("${PY2APP_PREFIX}/MacOS/python" --version | sed '
 SITEPACKAGES="/opt/local/Library/Frameworks/Python.framework/Versions/${PY2APP_PYTHON_VERSION}/lib/python${PY2APP_PYTHON_VERSION}/site-packages"
     
 msg "Create Info.plist for Deluge $version"
-sed -e s/%VERSION%/$VERSION/ -e s/%YEAR%/$YEAR/ Info.plist.in > Info.plist
 
 msg "Calling gtk-mac-bundler to create the skeleton"
+
+error
+
 gtk-mac-bundler deluge-macports.bundle
 
 msg "Unzip site-packages and make python softlink without version number"

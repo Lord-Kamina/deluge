@@ -23,20 +23,25 @@ import tarfile
 import time
 from contextlib import closing
 from datetime import datetime
-from importlib import resources
+
+if sys.version_info >= (3, 9):
+    from importlib.resources import files, as_file
+else:
+    from importlib_resources import files, as_file
+
+if sys.version_info >= (3, 8):
+    from importlib.metadata import version
+else:
+    from importlib_metadata import version
+
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import unquote_plus, urljoin
 from urllib.request import pathname2url
 
+from deluge.plugin_resource_manager import PluginResourceManager
 from deluge.decorators import deprecated
 from deluge.error import InvalidPathError
-
-try:
-    from importlib.metadata import distribution
-except ImportError:
-    from pkg_resources import get_distribution as distribution
-
 
 try:
     import chardet
@@ -96,7 +101,7 @@ def get_version():
     Returns:
         str: The version of Deluge.
     """
-    return distribution('Deluge').version
+    return version('deluge')
 
 
 def get_default_config_dir(filename=None):
@@ -304,15 +309,11 @@ def resource_filename(module: str, path: str) -> str:
     multiple Deluge packages installed.
     """
     path = Path(path)
-
-    try:
-        with resources.as_file(resources.files(module) / path) as resource_file:
+    if module == 'deluge' or module.startswith('deluge.ui'):
+        with as_file(files(module) / path) as resource_file:
             return str(resource_file)
-    except AttributeError:
-        # Python <= 3.8
-        with resources.path(module, path.parts[0]) as resource_file:
-            return str(resource_file.joinpath(*path.parts[1:]))
-
+    else:
+        return PluginResourceManager.resource_filename(module, path)
 
 def open_file(path, timestamp=None):
     """Opens a file or folder using the system configured program.

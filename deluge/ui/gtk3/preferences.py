@@ -1185,10 +1185,16 @@ class Preferences(component.Component):
         chooser.set_select_multiple(False)
         chooser.set_property('skip-taskbar-hint', True)
 
-        file_filter = Gtk.FileFilter()
-        file_filter.set_name(_('Plugin Eggs'))
-        file_filter.add_pattern('*.' + 'egg')
-        chooser.add_filter(file_filter)
+        egg_filter = Gtk.FileFilter()
+        egg_filter.set_name(_('Plugin Eggs'))
+        egg_filter.add_pattern('*.egg')
+
+        wheel_filter = Gtk.FileFilter()
+        wheel_filter.set_name(_('Plugin Wheels'))
+        wheel_filter.add_pattern('*.whl')
+
+        chooser.add_filter(egg_filter)        
+        chooser.add_filter(wheel_filter)
 
         # Run the dialog
         response = chooser.run()

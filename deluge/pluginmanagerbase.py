@@ -11,14 +11,22 @@
 import email
 import logging
 import os.path
+from pathlib import Path
+import sys
 
-import pkg_resources
 from twisted.internet import defer
 from twisted.python.failure import Failure
 
 import deluge.common
 import deluge.component as component
 import deluge.configmanager
+from deluge.plugin_resource_manager import PluginResourceManager
+
+from importlib.util import find_spec
+if sys.version_info >= (3, 10):
+    from importlib.metadata import entry_points, metadata, packages_distributions
+else:
+    from importlib_metadata import entry_points, metadata, packages_distributions
 
 log = logging.getLogger(__name__)
 
@@ -92,7 +100,7 @@ class PluginManagerBase:
 
     def scan_for_plugins(self):
         """Scans for available plugins"""
-        base_dir = deluge.common.resource_filename('deluge', 'plugins')
+        base_dir = deluge.common.resource_filename('deluge','plugins')
         user_dir = os.path.join(deluge.configmanager.get_config_dir(), 'plugins')
         base_subdir = [
             os.path.join(base_dir, f)
@@ -101,21 +109,32 @@ class PluginManagerBase:
         ]
         plugin_dirs = [base_dir, user_dir] + base_subdir
 
-        for dirname in plugin_dirs:
-            pkg_resources.working_set.add_entry(dirname)
-        self.pkg_env = pkg_resources.Environment(
-            plugin_dirs, platform=None, python=None
-        )
-
+        plugin_wheels = list(Path(base_dir).glob("*.whl"))
+        plugin_wheels.extend(list(Path(user_dir).glob("*.whl")))
+        plugin_eggs = list(Path(base_dir).glob("*.egg"))
+        plugin_eggs.extend(list(Path(user_dir).glob("*.egg")))
+        
+        plugin_dirs = [ 
+        str(f)
+        for f in plugin_wheels + plugin_eggs
+        if os.path.isfile(f)
+        ]
+        plugin_dirs.extend([base_dir, user_dir] + base_subdir)
+        sys.path.extend(plugin_dirs)
+        plugin_eps = entry_points(group=self.entry_name)
         self.available_plugins = []
-        for name in self.pkg_env:
-            log.debug(
-                'Found plugin: %s %s at %s',
-                self.pkg_env[name][0].project_name,
-                self.pkg_env[name][0].version,
-                self.pkg_env[name][0].location,
-            )
-            self.available_plugins.append(self.pkg_env[name][0].project_name)
+        for ep in plugin_eps:
+            try:
+                log.debug(
+                    'Found plugin: %s %s at %s',
+                    ep.name,
+                    ep.dist.version,
+                    find_spec(ep.module).loader.archive,
+                )
+            except ModuleNotFoundError as ex:
+                log.exception(ex)
+                continue
+            self.available_plugins.append(ep.name)
 
     def enable_plugin(self, plugin_name):
         """Enable a plugin.
@@ -137,21 +156,18 @@ class PluginManagerBase:
             return defer.succeed(True)
 
         plugin_name = plugin_name.replace(' ', '-')
-        egg = self.pkg_env[plugin_name][0]
-        # Activate is required by non-namespace plugins.
-        egg.activate()
+        archive = find_spec(plugin_name)
         return_d = defer.succeed(True)
-
-        for name in egg.get_entry_map(self.entry_name):
+        for ep in entry_points(name=plugin_name, group=self.entry_name):
             try:
-                cls = egg.load_entry_point(self.entry_name, name)
+                cls = ep.load()
                 instance = cls(plugin_name.replace('-', '_'))
             except component.ComponentAlreadyRegistered as ex:
                 log.error(ex)
                 return defer.succeed(False)
             except Exception as ex:
                 log.error(
-                    'Unable to instantiate plugin %r from %r!', name, egg.location
+                    'Unable to instantiate plugin %r from %r!', plugin_name, ep.loader.archive
                 )
                 log.exception(ex)
                 continue
@@ -187,6 +203,7 @@ class PluginManagerBase:
                     )
                     self.config['enabled_plugins'].append(plugin_name_space)
                 log.info('Plugin %s enabled...', plugin_name_space)
+                PluginResourceManager.prepare_for(plugin_name_space)
                 return True
 
             def on_started_error(result, instance):
@@ -248,6 +265,7 @@ class PluginManagerBase:
                 ret = False
             else:
                 log.info('Plugin %s disabled...', name)
+            PluginResourceManager.clear_for(name)
             return ret
 
         d.addBoth(on_disabled)
@@ -255,25 +273,12 @@ class PluginManagerBase:
 
     def get_plugin_info(self, name):
         """Returns a dictionary of plugin info from the metadata"""
-
-        if not self.pkg_env[name]:
-            log.warning('Failed to retrieve info for plugin: %s', name)
+        try:
+            plugin_metadata = metadata(name)
+        except ModuleNotFoundError:
+            log.warning(f"Failed to retrieve info for plugin: {name}")
             info = {}.fromkeys(METADATA_KEYS, '')
             info['Name'] = info['Version'] = 'not available'
             return info
-
-        pkg_info = self.pkg_env[name][0].get_metadata('PKG-INFO')
-        return self.parse_pkg_info(pkg_info)
-
-    @staticmethod
-    def parse_pkg_info(pkg_info):
-        metadata_msg = email.message_from_string(pkg_info)
-        metadata_ver = metadata_msg.get('Metadata-Version')
-
-        info = {key: metadata_msg.get(key, '') for key in METADATA_KEYS}
-
-        # Optional Description field in body (Metadata spec >=2.1)
-        if not info['Description'] and metadata_ver.startswith('2'):
-            info['Description'] = metadata_msg.get_payload().strip()
-
+        info = {key: plugin_metadata.get(key, '') for key in METADATA_KEYS}
         return info

@@ -14,7 +14,7 @@
 import logging
 import os.path
 
-from pkg_resources import resource_filename
+from deluge.common import resource_filename
 from twisted.internet import defer
 
 from deluge import component

@@ -59,6 +59,7 @@ stdlib = [
     'shelve',
     'marshal',
     'dom',
+    'importlib',
     'sqlite3',
     'zlib',
     'gzip',

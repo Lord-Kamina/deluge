@@ -8,6 +8,8 @@ pygobject
 pyxdg
 pillow
 pillow<=9; python_version=="3.7"
+importlib_metadata >= 3.9; python_version<"3.10"
+importlib_resources >= 1.4; python_version<"3.9"
 mako
 setuptools
 chardet
