@@ -8,6 +8,7 @@
 # See LICENSE for more details.
 #
 
+from build import ProjectBuilder
 import glob
 import os
 import platform
@@ -278,22 +279,15 @@ class BuildPlugins(Command):
     def run(self):
         # Build the plugin eggs
         plugin_path = 'deluge/plugins/*'
-
         for path in glob.glob(plugin_path):
             if os.path.exists(os.path.join(path, 'setup.py')):
                 if self.develop and self.install_dir:
-                    os.system(f"cd {path} && {sys.executable} setup.py develop --install-dir={self.install_dir}")
-#                     os.system(f"cd {path} && {sys.executable} -m pip install --editable . --prefix={self.install_dir}")
-#                     Command to use when moving to pyproject.toml
+                    os.system(f"cd {path} && {sys.executable} -m pip install --prefix={self.install_dir} --editable .")
                 elif self.develop:
-                	os.system(f"cd {path} && {sys.executable} setup.py develop")
-#                     os.system(f"cd {path} && {sys.executable} -m pip install --editable .")
-#                    Command to use when moving to pyproject.toml
+                    os.system(f"cd {path} && {sys.executable} -m pip install .")
                 else:
-                    os.system(f"cd {path} && {sys.executable} setup.py bdist_wheel -d ..")
-#                     os.system(f"cd {path} && {sys.executable} -m build . -o ..")
-#                     Command to use when moving to pyproject.toml
-
+                    builder = ProjectBuilder(source_dir=path, python_executable=sys.executable)
+                    builder.build("wheel", output_directory="deluge/plugins")
 
 class CleanPlugins(Command):
     description = 'Cleans the plugin folders'
@@ -340,27 +334,6 @@ class CleanPlugins(Command):
                 for fpath in os.listdir(path):
                     os.remove(os.path.join(path, fpath))
                 os.removedirs(path)
-
-
-class EggInfoPlugins(Command):
-    description = 'Create .egg-info directories for plugins'
-
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        # Build the plugin eggs
-        plugin_path = 'deluge/plugins/*'
-
-        for path in glob.glob(plugin_path):
-            if os.path.exists(os.path.join(path, 'setup.py')):
-                os.system('cd ' + path + '&& ' + sys.executable + ' setup.py egg_info')
-
 
 class Build(_build):
     sub_commands = [
@@ -412,8 +385,6 @@ cmdclass = {
     'clean_trans': CleanTranslations,
     'clean_docs': CleanDocs,
     'clean_webui': CleanWebUI,
-#     'clean': Clean,
-    'egg_info_plugins': EggInfoPlugins,
     'test': PyTest,
 }
 
