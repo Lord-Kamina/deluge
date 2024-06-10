@@ -12,11 +12,13 @@ import glob
 import os
 import platform
 import sys
-from setuptools.command.build import build as _build
 from shutil import rmtree, which
 
-from setuptools import Command, find_packages, setup
+from setuptools import Command, setup
+from setuptools.command.build import build as _build
 from setuptools.command.test import test as _test
+
+from build import ProjectBuilder
 
 sys.path.append(os.path.dirname(__file__))
 import msgfmt
@@ -43,6 +45,7 @@ metainfo_data = 'deluge/ui/data/share/metainfo/deluge.metainfo.xml'
 # Variables for setuptools.setup that we still need to computer dynamically.
 _entry_points = {'console_scripts': [], 'gui_scripts': [], 'deluge.ui': []}
 _data_files = []
+
 
 class PyTest(_test):
     def initialize_options(self):
@@ -278,21 +281,19 @@ class BuildPlugins(Command):
     def run(self):
         # Build the plugin eggs
         plugin_path = 'deluge/plugins/*'
-
         for path in glob.glob(plugin_path):
             if os.path.exists(os.path.join(path, 'setup.py')):
                 if self.develop and self.install_dir:
-                    os.system(f"cd {path} && {sys.executable} setup.py develop --install-dir={self.install_dir}")
-#                     os.system(f"cd {path} && {sys.executable} -m pip install --editable . --prefix={self.install_dir}")
-#                     Command to use when moving to pyproject.toml
+                    os.system(
+                        f'cd {path} && {sys.executable} -m pip install --prefix={self.install_dir} --editable .'
+                    )
                 elif self.develop:
-                	os.system(f"cd {path} && {sys.executable} setup.py develop")
-#                     os.system(f"cd {path} && {sys.executable} -m pip install --editable .")
-#                    Command to use when moving to pyproject.toml
+                    os.system(f'cd {path} && {sys.executable} -m pip install .')
                 else:
-                    os.system(f"cd {path} && {sys.executable} setup.py bdist_wheel -d ..")
-#                     os.system(f"cd {path} && {sys.executable} -m build . -o ..")
-#                     Command to use when moving to pyproject.toml
+                    builder = ProjectBuilder(
+                        source_dir=path, python_executable=sys.executable
+                    )
+                    builder.build('wheel', output_directory='deluge/plugins')
 
 
 class CleanPlugins(Command):
@@ -342,26 +343,6 @@ class CleanPlugins(Command):
                 os.removedirs(path)
 
 
-class EggInfoPlugins(Command):
-    description = 'Create .egg-info directories for plugins'
-
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        # Build the plugin eggs
-        plugin_path = 'deluge/plugins/*'
-
-        for path in glob.glob(plugin_path):
-            if os.path.exists(os.path.join(path, 'setup.py')):
-                os.system('cd ' + path + '&& ' + sys.executable + ' setup.py egg_info')
-
-
 class Build(_build):
     sub_commands = [
         ('build_webui', None),
@@ -379,7 +360,8 @@ class Build(_build):
         except ImportError as ex:
             print('Warning: libtorrent (libtorrent-rasterbar) not found: %s' % ex)
 
-class Clean():
+
+class Clean:
     sub_commands = [
         ('clean_plugins', None),
         ('clean_trans', None),
@@ -398,7 +380,6 @@ class Clean():
         # Run all sub-commands (at least those that need to be run)
         for cmd_name in self.get_sub_commands():
             self.run_command(cmd_name)
-#         _clean.run(self)
 
 
 cmdclass = {
@@ -412,8 +393,6 @@ cmdclass = {
     'clean_trans': CleanTranslations,
     'clean_docs': CleanDocs,
     'clean_webui': CleanWebUI,
-#     'clean': Clean,
-    'egg_info_plugins': EggInfoPlugins,
     'test': PyTest,
 }
 
