@@ -16,7 +16,6 @@ on:
       ref:
         description: "Enter a tag or commit to package"
         default: ""
-
 jobs:
   windows_package:
     runs-on: windows-2022
@@ -24,8 +23,12 @@ jobs:
     strategy:
       matrix:
         arch: [x64, x86]
-        python: ["3.9"]
-        libtorrent: [2.0.7, 1.2.19]
+        python: ["3.10"]
+        gvsbuild-stack: ["latest"]
+        libtorrent: [2.0.8, 1.2.19]
+        include:
+          - python: 3.7
+            gvsbuild-stack: older
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -49,12 +52,12 @@ jobs:
           cache: pip
 
       - name: Prepare pip
-        run: python -m pip install wheel setuptools==68.*
+        run: python -m pip install wheel setuptools==70.*
 
       - name: Install GTK
         run: |
           $WebClient = New-Object System.Net.WebClient
-          $WebClient.DownloadFile("https://github.com/deluge-torrent/gvsbuild-release/releases/download/latest/gvsbuild-py${{ matrix.python }}-vs16-${{ matrix.arch }}.zip","C:\GTK.zip")
+          $WebClient.DownloadFile("https://github.com/${{ github.repository_owner }}/gvsbuild-release/releases/download/${{ matrix.gvsbuild-stack }}/gvsbuild-py${{ matrix.python }}-vs17-${{ matrix.arch }}.zip","C:\GTK.zip")
           7z x C:\GTK.zip -oc:\GTK
           echo "C:\GTK\release\lib" | Out-File -FilePath $env:GITHUB_PATH -Append
           echo "C:\GTK\release\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
@@ -77,7 +80,6 @@ jobs:
         working-directory: deluge_src
         run: |
           python -m pip install .
-          python setup.py install_scripts
 
       - name: Freeze Deluge
         working-directory: packaging/win
