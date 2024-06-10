@@ -12,14 +12,14 @@ on:
         default: "0"
 jobs:
   test-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ["3.7", "3.10"]
+        python-version: ["3.9", "3.12"]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -74,16 +74,16 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        python-version: ["3.7", "3.10"]
+        python-version: ["3.9", "3.10"]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
