@@ -66,7 +66,7 @@ classifiers=[
 ]
 requires-python='>=3.8'
 license={file = 'LICENSE' }
-dynamic = ["version", "readme", "dependencies", "entry-points", "scripts", "gui-scripts"]
+dynamic = ["version", "readme", "dependencies", "optional-dependencies", "entry-points", "scripts", "gui-scripts"]
 
 [project.urls]
 Homepage='https://deluge-torrent.org'
