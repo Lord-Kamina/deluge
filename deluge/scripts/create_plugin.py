@@ -102,6 +102,7 @@ def create_plugin():
 
     print('creating files..')
     write_file(plugin_base, 'setup.py', SETUP)
+    write_file(plugin_base, 'pyproject.toml', PYPROJECT)
     write_file(src, '__init__.py', INIT)
     write_file(src, 'gtk3ui.py', GTK3UI)
     write_file(src, 'webui.py', WEBUI)
@@ -410,6 +411,12 @@ set PYTHONPATH=%%BASEDIR%%/temp
 %(python_path)s setup.py build develop --install-dir %%BASEDIR%%\\temp
 copy "%%BASEDIR%%\\temp\\*.egg-link" "%%CONFIG_DIR%%\\plugins"
 rd /s /q %%BASEDIR%%\\temp
+"""
+
+PYPROJECT = """
+[build-system]
+requires = ["setuptools>=64", "build>=1.0"]
+build-backend = "setuptools.build_meta"
 """
 
 create_plugin()
