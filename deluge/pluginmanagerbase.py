@@ -125,11 +125,17 @@ class PluginManagerBase:
         self.available_plugins = []
         for ep in plugin_eps:
             try:
+                location = ""
+                plugin_loader = find_spec(ep.module).loader
+                try:
+                    location = plugin_loader.archive
+                except AttributeError:
+                    location = plugin_loader.get_filename(ep.module)
                 log.debug(
                     'Found plugin: %s %s at %s',
                     ep.name,
                     ep.dist.version,
-                    find_spec(ep.module).loader.archive,
+                    location,
                 )
             except ModuleNotFoundError as ex:
                 log.exception(ex)
