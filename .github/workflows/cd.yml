@@ -24,25 +24,25 @@ jobs:
     strategy:
       matrix:
         arch: [x64, x86]
-        python: ["3.11"]
-        libtorrent: [2.0.10, 1.2.19]
+        python: ["3.10"]
+        libtorrent: [2.0.9, 1.2.19]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       # Checkout Deluge source to subdir to enable packaging any tag/commit
       - name: Checkout Deluge source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
           fetch-depth: 0
           path: deluge_src
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python}}
           architecture: ${{ matrix.arch }}
