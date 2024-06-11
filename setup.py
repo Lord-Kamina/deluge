@@ -8,16 +8,16 @@
 # See LICENSE for more details.
 #
 
-from build import ProjectBuilder
 import glob
 import os
 import platform
 import sys
-from setuptools.command.build import build as _build
-from shutil import rmtree, which
 
-from setuptools import Command, find_packages, setup
+from build import ProjectBuilder
+from setuptools import Command, setup
+from setuptools.command.build import build as _build
 from setuptools.command.test import test as _test
+from shutil import rmtree, which
 
 sys.path.append(os.path.dirname(__file__))
 import msgfmt
@@ -282,9 +282,9 @@ class BuildPlugins(Command):
         for path in glob.glob(plugin_path):
             if os.path.exists(os.path.join(path, 'setup.py')):
                 if self.develop and self.install_dir:
-                    os.system(f"cd {path} && {sys.executable} -m pip install --prefix={self.install_dir} --editable .")
+                    os.system(f'cd {path} && {sys.executable} -m pip install --prefix={self.install_dir} --editable .')
                 elif self.develop:
-                    os.system(f"cd {path} && {sys.executable} -m pip install .")
+                    os.system(f'cd {path} && {sys.executable} -m pip install .')
                 else:
                     builder = ProjectBuilder(source_dir=path, python_executable=sys.executable)
                     builder.build("wheel", output_directory="deluge/plugins")
