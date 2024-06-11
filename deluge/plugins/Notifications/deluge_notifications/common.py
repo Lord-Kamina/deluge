@@ -14,10 +14,10 @@
 import logging
 import os.path
 
-from deluge.common import resource_filename
 from twisted.internet import defer
 
 from deluge import component
+from deluge.common import resource_filename
 from deluge.event import known_events
 
 log = logging.getLogger(__name__)
