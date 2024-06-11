@@ -31,7 +31,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: sudo apt-get install enchant-2
+        run: sudo apt-get install enchant-2 libgirepository1.0-dev
 
       - name: Build docs with tox
         env:

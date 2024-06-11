@@ -44,6 +44,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get install libcairo2-dev libgirepository1.0-dev
           uv pip install -r requirements-ci.txt
           uv pip install -e .
 
