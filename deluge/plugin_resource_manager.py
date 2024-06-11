@@ -64,9 +64,9 @@ class PluginResourceManager:
                 if not isfile(fs_path):
                     fs_path = cls.resource_managers[module].stack.enter_context(file)
         except ModuleNotFoundError as e:
-            raise ValueError(f"Can't determine version for module {module} which maps to package: {package_name}") from e
+            raise ValueError(f'Can\'t determine version for module {module} which maps to package: {package_name}') from e
         except FileNotFoundError as e:
-            raise ValueError(f"File not found: {path}") from e
+            raise ValueError(f'File not found: {path}') from e
         with cls.resource_manager_lock:
             cls.resource_managers[module].files_open.update({path : fs_path})
         return str(fs_path)

@@ -108,10 +108,10 @@ class PluginManagerBase:
         ]
         plugin_dirs = [base_dir, user_dir] + base_subdir
 
-        plugin_wheels = list(Path(base_dir).glob("*.whl"))
-        plugin_wheels.extend(list(Path(user_dir).glob("*.whl")))
-        plugin_eggs = list(Path(base_dir).glob("*.egg"))
-        plugin_eggs.extend(list(Path(user_dir).glob("*.egg")))
+        plugin_wheels = list(Path(base_dir).glob('*.whl'))
+        plugin_wheels.extend(list(Path(user_dir).glob('*.whl')))
+        plugin_eggs = list(Path(base_dir).glob('*.egg'))
+        plugin_eggs.extend(list(Path(user_dir).glob('*.egg')))
         
         plugin_dirs = [ 
         str(f)
@@ -124,7 +124,7 @@ class PluginManagerBase:
         self.available_plugins = []
         for ep in plugin_eps:
             try:
-                location = ""
+                location = ''
                 plugin_loader = find_spec(ep.module).loader
                 try:
                     location = plugin_loader.archive
@@ -280,7 +280,7 @@ class PluginManagerBase:
         try:
             plugin_metadata = metadata(name)
         except ModuleNotFoundError:
-            log.warning(f"Failed to retrieve info for plugin: {name}")
+            log.warning(f'Failed to retrieve info for plugin: {name}')
             info = {}.fromkeys(METADATA_KEYS, '')
             info['Name'] = info['Version'] = 'not available'
             return info

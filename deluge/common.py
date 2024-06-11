@@ -25,9 +25,9 @@ from contextlib import closing
 from datetime import datetime
 
 if sys.version_info >= (3, 9):
-    from importlib.resources import files, as_file
+    from importlib.resources import as_file, files
 else:
-    from importlib_resources import files, as_file
+    from importlib_resources import as_file, files
 
 if sys.version_info >= (3, 8):
     from importlib.metadata import version
