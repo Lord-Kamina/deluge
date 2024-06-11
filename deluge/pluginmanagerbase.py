@@ -8,7 +8,6 @@
 
 
 """PluginManagerBase"""
-import email
 import logging
 import os.path
 from pathlib import Path
@@ -24,9 +23,9 @@ from deluge.plugin_resource_manager import PluginResourceManager
 
 from importlib.util import find_spec
 if sys.version_info >= (3, 10):
-    from importlib.metadata import entry_points, metadata, packages_distributions
+    from importlib.metadata import entry_points, metadata
 else:
-    from importlib_metadata import entry_points, metadata, packages_distributions
+    from importlib_metadata import entry_points, metadata
 
 log = logging.getLogger(__name__)
 
@@ -162,7 +161,6 @@ class PluginManagerBase:
             return defer.succeed(True)
 
         plugin_name = plugin_name.replace(' ', '-')
-        archive = find_spec(plugin_name)
         return_d = defer.succeed(True)
         for ep in entry_points(name=plugin_name, group=self.entry_name):
             try:
@@ -180,7 +178,7 @@ class PluginManagerBase:
             try:
                 return_d = defer.maybeDeferred(instance.enable)
             except Exception as ex:
-                log.error('Unable to enable plugin: %s', name)
+                log.error('Unable to enable plugin: %s', plugin_name)
                 log.exception(ex)
                 return_d = defer.fail(False)
 
@@ -188,7 +186,7 @@ class PluginManagerBase:
                 import warnings
 
                 warnings.warn_explicit(
-                    DEPRECATION_WARNING % name,
+                    DEPRECATION_WARNING % plugin_name,
                     DeprecationWarning,
                     instance.__module__,
                     0,

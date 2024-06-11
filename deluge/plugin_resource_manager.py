@@ -18,14 +18,14 @@ from pathlib import Path
 from threading import Lock
 
 if sys.version_info >= (3, 9):
-    from importlib.resources import files, as_file
+    from importlib.resources import as_file, files
 else:
-    from importlib_resources import files, as_file
+    from importlib_resources import as_file, files
 
 if sys.version_info >= (3, 10):
-    from importlib.metadata import entry_points, version, metadata, packages_distributions
+    from importlib.metadata import packages_distributions
 else:
-    from importlib_metadata import entry_points, version, metadata, packages_distributions
+    from importlib_metadata import packages_distributions
 
 log = logging.getLogger(__name__)
 
@@ -48,42 +48,42 @@ class PluginResourceManager:
     resource_managers: dict[str, FileContextManager] = {} # We keep a FileContextManager for each enabled plugin.
     
     @classmethod
-    def resource_filename(self, module: str, path: str) -> str:
+    def resource_filename(cls, module: str, path: str) -> str:
         """Try to reuse previously accessed resources, and makes new copies if we can't"""
         try:
             file = as_file(files(module) / path)
             package_name = packages_distributions()[module][0]
-            if module not in self.resource_managers:
-                with self.resource_manager_lock:
-                    self.resource_managers.update({module : PluginResourceManager.FileContextManager()})
+            if module not in cls.resource_managers:
+                with cls.resource_manager_lock:
+                    cls.resource_managers.update({module : PluginResourceManager.FileContextManager()})
             fs_path = Path()
-            if path not in self.resource_managers[module].files_open:
-                fs_path = self.resource_managers[module].stack.enter_context(file)
+            if path not in cls.resource_managers[module].files_open:
+                fs_path = cls.resource_managers[module].stack.enter_context(file)
             else:
-                fs_path = self.resource_managers[module].files_open[path]
+                fs_path = cls.resource_managers[module].files_open[path]
                 if not isfile(fs_path):
-                    fs_path = self.resource_managers[module].stack.enter_context(file)
+                    fs_path = cls.resource_managers[module].stack.enter_context(file)
         except ModuleNotFoundError as e:
             raise ValueError(f"Can't determine version for module {module} which maps to package: {package_name}") from e
         except FileNotFoundError as e:
             raise ValueError(f"File not found: {path}") from e
-        with self.resource_manager_lock:
-            self.resource_managers[module].files_open.update({path : fs_path})
+        with cls.resource_manager_lock:
+            cls.resource_managers[module].files_open.update({path : fs_path})
         return str(fs_path)
 
     @classmethod
-    def exists_for(self, name: str) -> bool:
-        return name in self.resource_managers
+    def exists_for(cls, name: str) -> bool:
+        return name in cls.resource_managers
 
     @classmethod
-    def prepare_for(self, name: str):
-        self.clear_for(name)
-        with self.resource_manager_lock:
-            self.resource_managers.update({name : PluginResourceManager.FileContextManager()})
+    def prepare_for(cls, name: str):
+        cls.clear_for(name)
+        with cls.resource_manager_lock:
+            cls.resource_managers.update({name : PluginResourceManager.FileContextManager()})
 
     @classmethod
-    def clear_for(self, name: str):
-        if name in self.resource_managers:
-            self.resource_managers[name].reset()
-            with self.resource_manager_lock:
-                del self.resource_managers[name]
+    def clear_for(cls, name: str):
+        if name in cls.resource_managers:
+            cls.resource_managers[name].reset()
+            with cls.resource_manager_lock:
+                del cls.resource_managers[name]
