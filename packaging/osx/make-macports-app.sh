@@ -53,7 +53,7 @@ popd
 export PY2APP_PYTHON_VERSION=$("${PY2APP_PREFIX}/MacOS/python" --version | sed 's|Python ||' | cut -f 1,2 -d '.')
 
 SITEPACKAGES="/opt/local/Library/Frameworks/Python.framework/Versions/${PY2APP_PYTHON_VERSION}/lib/python${PY2APP_PYTHON_VERSION}/site-packages"
-    
+
 msg "Create Info.plist for Deluge $version"
 
 msg "Calling gtk-mac-bundler to create the skeleton"

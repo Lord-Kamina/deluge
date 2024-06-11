@@ -14,7 +14,7 @@
   <binary dest="${bundle}/Contents/MacOS/deluged-bin">${prefix:py2app}/MacOS/deluged</binary>
   <binary dest="${bundle}/Contents/MacOS/deluge-web-bin">${prefix:py2app}/MacOS/deluge-web</binary>
   <binary dest="${bundle}/Contents/MacOS/deluge-console-bin">${prefix:py2app}/MacOS/deluge-console</binary>
-  
+
   <data dest="${bundle}/Contents/Resources/lib/libpython${env:PY2APP_PYTHON_VERSION}.dylib">${prefix:py2app}/Frameworks/Python.framework/Versions/${env:PY2APP_PYTHON_VERSION}/Python</data>
   <binary dest="${bundle}/Contents/MacOS/python">${prefix:py2app}/MacOS/python</binary>
 
