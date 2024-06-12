@@ -294,6 +294,7 @@ class BuildPlugins(Command):
                     )
                     builder.build('wheel', output_directory='deluge/plugins')
 
+
 class CleanPlugins(Command):
     description = 'Cleans the plugin folders'
     user_options = [
