@@ -39,9 +39,9 @@ from pathlib import Path
 from urllib.parse import unquote_plus, urljoin
 from urllib.request import pathname2url
 
-from deluge.plugin_resource_manager import PluginResourceManager
 from deluge.decorators import deprecated
 from deluge.error import InvalidPathError
+from deluge.plugin_resource_manager import PluginResourceManager
 
 try:
     import chardet
@@ -314,6 +314,7 @@ def resource_filename(module: str, path: str) -> str:
             return str(resource_file)
     else:
         return PluginResourceManager.resource_filename(module, path)
+
 
 def open_file(path, timestamp=None):
     """Opens a file or folder using the system configured program.
