@@ -45,6 +45,7 @@ metainfo_data = 'deluge/ui/data/share/metainfo/deluge.metainfo.xml'
 _entry_points = {'console_scripts': [], 'gui_scripts': [], 'deluge.ui': []}
 _data_files = []
 
+
 class PyTest(_test):
     def initialize_options(self):
         _test.initialize_options(self)
@@ -282,12 +283,18 @@ class BuildPlugins(Command):
         for path in glob.glob(plugin_path):
             if os.path.exists(os.path.join(path, 'setup.py')):
                 if self.develop and self.install_dir:
-                    os.system(f'cd {path} && {sys.executable} -m pip install --prefix={self.install_dir} --editable .')
+                    os.system(
+                        f'cd {path} && {sys.executable} -m pip install --prefix={self.install_dir} --editable .'
+                    )
                 elif self.develop:
-                    os.system(f'cd {path} && {sys.executable} -m pip install .')
+                    os.system(
+                        f'cd {path} && {sys.executable} -m pip install .'
+                    )
                 else:
-                    builder = ProjectBuilder(source_dir=path, python_executable=sys.executable)
-                    builder.build("wheel", output_directory="deluge/plugins")
+                    builder = ProjectBuilder(
+                        source_dir=path, python_executable=sys.executable
+                    )
+                    builder.build('wheel', output_directory='deluge/plugins')
 
 class CleanPlugins(Command):
     description = 'Cleans the plugin folders'
@@ -335,6 +342,7 @@ class CleanPlugins(Command):
                     os.remove(os.path.join(path, fpath))
                 os.removedirs(path)
 
+
 class Build(_build):
     sub_commands = [
         ('build_webui', None),
@@ -351,6 +359,7 @@ class Build(_build):
             print(f'Info: Found libtorrent ({LT_VERSION}) installed.')
         except ImportError as ex:
             print('Warning: libtorrent (libtorrent-rasterbar) not found: %s' % ex)
+
 
 class Clean():
     sub_commands = [
@@ -371,7 +380,6 @@ class Clean():
         # Run all sub-commands (at least those that need to be run)
         for cmd_name in self.get_sub_commands():
             self.run_command(cmd_name)
-#         _clean.run(self)
 
 
 cmdclass = {
