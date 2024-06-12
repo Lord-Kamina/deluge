@@ -40,7 +40,7 @@ pushd ../../
 # find ./ \( -name '__pycache__' -or -name 'build' \) -type d -ls -depth -delete
 msg "Running build"
 msg "Creating app skeleton"
-# python3 setup.py py2app --verbose --dist-dir "${BUILDDIR}/app" --no-strip --graph --xref  --use-faulthandler --verbose-interpreter 
+# python3 setup.py py2app --verbose --dist-dir "${BUILDDIR}/app" --no-strip --graph --xref  --use-faulthandler --verbose-interpreter
 msg "Creating Wheel"
 sed -e s/%VERSION%/$VERSION/ -e s/%YEAR%/$YEAR/ "${DELUGEDIR}/packaging/osx/Info.plist.in" > "${DELUGEDIR}/packaging/osx/Info.plist"
 python3 -m py2app --pyproject-toml="${DELUGEDIR}/pyproject.toml"
