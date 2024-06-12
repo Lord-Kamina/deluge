@@ -287,9 +287,7 @@ class BuildPlugins(Command):
                         f'cd {path} && {sys.executable} -m pip install --prefix={self.install_dir} --editable .'
                     )
                 elif self.develop:
-                    os.system(
-                        f'cd {path} && {sys.executable} -m pip install .'
-                    )
+                    os.system(f'cd {path} && {sys.executable} -m pip install .')
                 else:
                     builder = ProjectBuilder(
                         source_dir=path, python_executable=sys.executable
@@ -361,7 +359,7 @@ class Build(_build):
             print('Warning: libtorrent (libtorrent-rasterbar) not found: %s' % ex)
 
 
-class Clean():
+class Clean:
     sub_commands = [
         ('clean_plugins', None),
         ('clean_trans', None),
