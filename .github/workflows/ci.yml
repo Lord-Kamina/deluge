@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ["3.9", "3.12"]
+        python-version: ["3.9", "3.10"]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -36,6 +36,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get install libcairo2-dev
           pip install --upgrade pip wheel setuptools
           pip install -r requirements.txt -r requirements-tests.txt -r requirements-ci.txt
           pip install -e .
