@@ -10,8 +10,6 @@
 
 import logging
 import sys
-
-
 from contextlib import ExitStack
 from os.path import isfile
 from pathlib import Path
@@ -35,6 +33,7 @@ class PluginResourceManager:
 
     class FileContextManager:
         """FileContextManager helps us keep track of open files to avoid creating multiple copies of any given file."""
+
         def __init__(self):
             self.files_open: dict[str, Path] = {}
             self.stack = ExitStack()
@@ -44,8 +43,10 @@ class PluginResourceManager:
                 self.stack.pop_all().close()
                 self.files_open.clear()
 
-    resource_manager_lock = Lock()  # Just in case, share a lock to prevent race conditions.
-    resource_managers: dict[str, FileContextManager] = {}  # We keep a FileContextManager for each enabled plugin.
+    resource_manager_lock = Lock()
+    # Just in case, share a lock to prevent race conditions.
+    resource_managers: dict[str, FileContextManager] = {}
+    # We keep a FileContextManager for each enabled plugin.
 
     @classmethod
     def resource_filename(cls, module: str, path: str) -> str:
@@ -55,7 +56,9 @@ class PluginResourceManager:
             package_name = packages_distributions()[module][0]
             if module not in cls.resource_managers:
                 with cls.resource_manager_lock:
-                    cls.resource_managers.update({module : PluginResourceManager.FileContextManager()})
+                    cls.resource_managers.update(
+                        {module: PluginResourceManager.FileContextManager()}
+                    )
             fs_path = Path()
             if path not in cls.resource_managers[module].files_open:
                 fs_path = cls.resource_managers[module].stack.enter_context(file)
@@ -65,12 +68,12 @@ class PluginResourceManager:
                     fs_path = cls.resource_managers[module].stack.enter_context(file)
         except ModuleNotFoundError as e:
             raise ValueError(
-              f'Can\'t determine version for module {module} which maps to package: {package_name}'
+                f'Can\'t determine version for module {module} which maps to package: {package_name}'
             ) from e
         except FileNotFoundError as e:
             raise ValueError(f'File not found: {path}') from e
         with cls.resource_manager_lock:
-            cls.resource_managers[module].files_open.update({path : fs_path})
+            cls.resource_managers[module].files_open.update({path: fs_path})
         return str(fs_path)
 
     @classmethod
@@ -81,7 +84,9 @@ class PluginResourceManager:
     def prepare_for(cls, name: str):
         cls.clear_for(name)
         with cls.resource_manager_lock:
-            cls.resource_managers.update({name : PluginResourceManager.FileContextManager()})
+            cls.resource_managers.update(
+                {name: PluginResourceManager.FileContextManager()}
+            )
 
     @classmethod
     def clear_for(cls, name: str):

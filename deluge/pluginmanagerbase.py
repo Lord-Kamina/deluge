@@ -113,11 +113,7 @@ class PluginManagerBase:
         plugin_eggs = list(Path(base_dir).glob('*.egg'))
         plugin_eggs.extend(list(Path(user_dir).glob('*.egg')))
 
-        plugin_dirs = [
-          str(f)
-          for f in plugin_wheels + plugin_eggs
-          if os.path.isfile(f)
-        ]
+        plugin_dirs = [str(f) for f in plugin_wheels + plugin_eggs if os.path.isfile(f)]
         plugin_dirs.extend([base_dir, user_dir] + base_subdir)
         sys.path.extend(plugin_dirs)
         plugin_eps = entry_points(group=self.entry_name)
@@ -171,7 +167,9 @@ class PluginManagerBase:
                 return defer.succeed(False)
             except Exception as ex:
                 log.error(
-                    'Unable to instantiate plugin %r from %r!', plugin_name, ep.loader.archive
+                    'Unable to instantiate plugin %r from %r!',
+                    plugin_name,
+                    ep.loader.archive,
                 )
                 log.exception(ex)
                 continue
