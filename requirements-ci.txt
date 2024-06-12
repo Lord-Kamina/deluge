@@ -1,2 +1,2 @@
-libtorrent==2.0.10
+libtorrent>=2.0.9
 pytest==7.4.2
