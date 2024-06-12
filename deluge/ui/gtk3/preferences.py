@@ -1193,7 +1193,7 @@ class Preferences(component.Component):
         wheel_filter.set_name(_('Plugin Wheels'))
         wheel_filter.add_pattern('*.whl')
 
-        chooser.add_filter(egg_filter)        
+        chooser.add_filter(egg_filter)
         chooser.add_filter(wheel_filter)
 
         # Run the dialog

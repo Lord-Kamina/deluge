@@ -136,5 +136,5 @@ class Command(BaseCommand):
 
     def complete(self, line):
         return component.get('ConsoleUI').tab_complete_path(
-            line, ext=('.egg','.whl'), sort='name', dirs_first=-1
+            line, ext=('.egg', '.whl'), sort='name', dirs_first=-1
         )

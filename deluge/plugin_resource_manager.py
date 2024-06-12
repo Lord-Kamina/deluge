@@ -11,9 +11,9 @@
 import logging
 import sys
 
-from os.path import isfile
 
 from contextlib import ExitStack
+from os.path import isfile
 from pathlib import Path
 from threading import Lock
 
@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 
 class PluginResourceManager:
     """PluginResourceManager handles access to plugin resources by looking over creation of copies on disk"""
-    
+
     class FileContextManager:
         """FileContextManager helps us keep track of open files to avoid creating multiple copies of any given file."""
         def __init__(self):
@@ -44,9 +44,9 @@ class PluginResourceManager:
                 self.stack.pop_all().close()
                 self.files_open.clear()
 
-    resource_manager_lock = Lock() # Just in case, share a lock to prevent race conditions.
-    resource_managers: dict[str, FileContextManager] = {} # We keep a FileContextManager for each enabled plugin.
-    
+    resource_manager_lock = Lock()  # Just in case, share a lock to prevent race conditions.
+    resource_managers: dict[str, FileContextManager] = {}  # We keep a FileContextManager for each enabled plugin.
+
     @classmethod
     def resource_filename(cls, module: str, path: str) -> str:
         """Try to reuse previously accessed resources, and makes new copies if we can't"""
@@ -64,7 +64,9 @@ class PluginResourceManager:
                 if not isfile(fs_path):
                     fs_path = cls.resource_managers[module].stack.enter_context(file)
         except ModuleNotFoundError as e:
-            raise ValueError(f'Can\'t determine version for module {module} which maps to package: {package_name}') from e
+            raise ValueError(
+              f'Can\'t determine version for module {module} which maps to package: {package_name}'
+            ) from e
         except FileNotFoundError as e:
             raise ValueError(f'File not found: {path}') from e
         with cls.resource_manager_lock:

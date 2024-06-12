@@ -10,8 +10,9 @@
 """PluginManagerBase"""
 import logging
 import os.path
-from pathlib import Path
 import sys
+from importlib.util import find_spec
+from pathlib import Path
 
 from twisted.internet import defer
 from twisted.python.failure import Failure
@@ -21,7 +22,6 @@ import deluge.component as component
 import deluge.configmanager
 from deluge.plugin_resource_manager import PluginResourceManager
 
-from importlib.util import find_spec
 if sys.version_info >= (3, 10):
     from importlib.metadata import entry_points, metadata
 else:
@@ -99,7 +99,7 @@ class PluginManagerBase:
 
     def scan_for_plugins(self):
         """Scans for available plugins"""
-        base_dir = deluge.common.resource_filename('deluge','plugins')
+        base_dir = deluge.common.resource_filename('deluge', 'plugins')
         user_dir = os.path.join(deluge.configmanager.get_config_dir(), 'plugins')
         base_subdir = [
             os.path.join(base_dir, f)
@@ -112,11 +112,11 @@ class PluginManagerBase:
         plugin_wheels.extend(list(Path(user_dir).glob('*.whl')))
         plugin_eggs = list(Path(base_dir).glob('*.egg'))
         plugin_eggs.extend(list(Path(user_dir).glob('*.egg')))
-        
-        plugin_dirs = [ 
-        str(f)
-        for f in plugin_wheels + plugin_eggs
-        if os.path.isfile(f)
+
+        plugin_dirs = [
+          str(f)
+          for f in plugin_wheels + plugin_eggs
+          if os.path.isfile(f)
         ]
         plugin_dirs.extend([base_dir, user_dir] + base_subdir)
         sys.path.extend(plugin_dirs)
