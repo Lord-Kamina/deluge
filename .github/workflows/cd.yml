@@ -54,7 +54,7 @@ jobs:
       - name: Install GTK
         run: |
           $WebClient = New-Object System.Net.WebClient
-          $WebClient.DownloadFile("https://github.com/deluge-torrent/gvsbuild-release/releases/download/latest/gvsbuild-py${{ matrix.python }}-vs16-${{ matrix.arch }}.zip","C:\GTK.zip")
+          $WebClient.DownloadFile("https://github.com/${{ github.repository_owner }}/gvsbuild-release/releases/download/latest/gvsbuild-py${{ matrix.python }}-vs17-${{ matrix.arch }}.zip","C:\GTK.zip")
           7z x C:\GTK.zip -oc:\GTK
           echo "C:\GTK\release\lib" | Out-File -FilePath $env:GITHUB_PATH -Append
           echo "C:\GTK\release\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
