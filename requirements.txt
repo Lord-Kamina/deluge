@@ -1,5 +1,6 @@
 libtorrent
-twisted[tls]>=17.1
+twisted[tls]>=17.1; sys_platform != 'win32'
+twisted[tls]<23,>=17.1; sys_platform == 'win32'
 # Add pyasn1 for setuptools workaround: https://github.com/pypa/setuptools/issues/1510
 pyasn1
 rencode
