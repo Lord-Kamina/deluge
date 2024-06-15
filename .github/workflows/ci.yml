@@ -84,6 +84,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.13"]
+        gvsbuild-stack: ["latest"]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -104,7 +105,7 @@ jobs:
       - name: Install GTK
         run: |
           $WebClient = New-Object System.Net.WebClient
-          $WebClient.DownloadFile("https://github.com/${{ github.repository_owner }}/gvsbuild-release/releases/download/latest/gvsbuild-py${{ matrix.python-version }}-vs17-x64.zip","C:\GTK.zip")
+          $WebClient.DownloadFile("https://github.com/${{ github.repository_owner }}/gvsbuild-release/releases/download/${{ matrix.gvsbuild-stack }}/gvsbuild-py${{ matrix.python-version }}-vs17-x64.zip","C:\GTK.zip")
           7z x C:\GTK.zip -oc:\GTK
           echo "C:\GTK\release\lib" | Out-File -FilePath $env:GITHUB_PATH -Append
           echo "C:\GTK\release\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
