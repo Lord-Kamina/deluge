@@ -12,6 +12,7 @@ import traceback
 from pathlib import Path
 
 import pytest
+import pytest_twisted
 from twisted.internet import defer, protocol, reactor
 from twisted.internet.defer import Deferred
 from twisted.internet.error import CannotListenError
@@ -133,7 +134,7 @@ class ProcessOutputHandler(protocol.ProcessProtocol):
         with open(self.logfile, 'w') as f:
             f.write(self.log_output)
 
-    @defer.inlineCallbacks
+    @pytest_twisted.inlineCallbacks
     def kill(self):
         """Kill the running process.
 
@@ -300,7 +301,7 @@ except Exception:
     if extra_callbacks:
         callbacks.extend(extra_callbacks)
 
-    @defer.inlineCallbacks
+    @pytest_twisted.inlineCallbacks
     def shutdown_daemon():
         username, password = get_localhost_auth()
         if not (username and password):
