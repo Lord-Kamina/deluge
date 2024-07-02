@@ -3,6 +3,7 @@ twisted[tls]>=17.1; sys_platform != 'win32'
 twisted[tls]<23,>=17.1; sys_platform == 'win32'
 rencode
 pyopenssl
+pygobject
 pyxdg
 pillow
 mako
