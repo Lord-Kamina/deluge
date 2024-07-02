@@ -16,7 +16,10 @@ import logging
 import os
 import sys
 
-import pkg_resources
+if sys.version_info >= (3, 10):
+    from importlib.metadata import entry_points
+else:
+    from importlib_metadata import entry_points
 
 import deluge.common
 import deluge.configmanager
@@ -34,7 +37,7 @@ def start_ui():
 
     # Get the registered UI entry points
     ui_entrypoints = {}
-    for entrypoint in pkg_resources.iter_entry_points('deluge.ui'):
+    for entrypoint in entry_points(group='deluge.ui'):
         try:
             ui_entrypoints[entrypoint.name] = entrypoint.load()
         except ImportError:

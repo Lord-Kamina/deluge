@@ -15,7 +15,7 @@ import os.path
 from functools import wraps
 from sys import exc_info
 
-from pkg_resources import resource_filename
+from deluge.common import resource_filename
 
 
 def get_resource(filename):

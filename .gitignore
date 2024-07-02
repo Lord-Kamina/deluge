@@ -24,3 +24,4 @@ RELEASE-VERSION
 # used by setuptools to cache downloaded eggs
 /.eggs
 _pytest_temp/
+*.whl
