@@ -41,7 +41,7 @@ jobs:
         run: |
           sudo apt-get install libcairo2-dev libgirepository1.0-dev
           pip install --upgrade pip wheel setuptools
-          pip install -r requirements-ci.txt
+          pip install -r requirements.txt -r requirements-tests.txt -r requirements-ci.txt
           pip install -e .
 
       - name: Install security dependencies
@@ -110,7 +110,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip wheel setuptools
-          pip install -r requirements-ci.txt
+          pip install -r requirements.txt -r requirements-tests.txt -r requirements-ci.txt
           pip install -e .
 
       - name: Test with pytest

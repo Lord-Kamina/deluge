@@ -1,4 +1,2 @@
--r requirements.txt
--r requirements-tests.txt
 pytest
 libtorrent<2.0.9

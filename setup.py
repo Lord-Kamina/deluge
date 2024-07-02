@@ -12,16 +12,14 @@ import glob
 import os
 import platform
 import sys
-from distutils.command.build import build as _build
-from distutils.command.clean import clean as _clean
-from distutils.command.install_data import install_data as _install_data
+from setuptools.command.build import build as _build
 from shutil import rmtree, which
 
 from setuptools import Command, find_packages, setup
 from setuptools.command.test import test as _test
 
+sys.path.append(os.path.dirname(__file__))
 import msgfmt
-from version import get_version
 
 try:
     from sphinx.setup_command import BuildDoc
@@ -42,13 +40,9 @@ def osx_check():
 desktop_data = 'deluge/ui/data/share/applications/deluge.desktop'
 metainfo_data = 'deluge/ui/data/share/metainfo/deluge.metainfo.xml'
 
-# Variables for setuptools.setup
-_package_data = {}
-_exclude_package_data = {}
+# Variables for setuptools.setup that we still need to computer dynamically.
 _entry_points = {'console_scripts': [], 'gui_scripts': [], 'deluge.ui': []}
 _data_files = []
-_version = get_version(prefix='deluge-', suffix='.dev0')
-
 
 class PyTest(_test):
     def initialize_options(self):
@@ -393,25 +387,8 @@ class Build(_build):
         except ImportError as ex:
             print('Warning: libtorrent (libtorrent-rasterbar) not found: %s' % ex)
 
-
-class InstallData(_install_data):
-    """Custom class to fix `setup install` copying data files to incorrect location. (Bug #1389)"""
-
-    def finalize_options(self):
-        self.install_dir = None
-        self.set_undefined_options(
-            'install',
-            ('install_data', 'install_dir'),
-            ('root', 'root'),
-            ('force', 'force'),
-        )
-
-    def run(self):
-        _install_data.run(self)
-
-
-class Clean(_clean):
-    sub_commands = _clean.sub_commands + [
+class Clean():
+    sub_commands = [
         ('clean_plugins', None),
         ('clean_trans', None),
         ('clean_webui', None),
@@ -429,7 +406,7 @@ class Clean(_clean):
         # Run all sub-commands (at least those that need to be run)
         for cmd_name in self.get_sub_commands():
             self.run_command(cmd_name)
-        _clean.run(self)
+#         _clean.run(self)
 
 
 cmdclass = {
@@ -439,12 +416,11 @@ cmdclass = {
     'build_plugins': BuildPlugins,
     'build_docs': BuildDoc,
     'spellcheck_docs': BuildDoc,
-    'install_data': InstallData,
     'clean_plugins': CleanPlugins,
     'clean_trans': CleanTranslations,
     'clean_docs': CleanDocs,
     'clean_webui': CleanWebUI,
-    'clean': Clean,
+#     'clean': Clean,
     'egg_info_plugins': EggInfoPlugins,
     'test': PyTest,
 }
@@ -510,103 +486,9 @@ _entry_points['deluge.ui'] = [
 ]
 
 
-_package_data['deluge'] = [
-    'ui/data/pixmaps/*.png',
-    'ui/data/pixmaps/*.svg',
-    'ui/data/pixmaps/*.ico',
-    'ui/data/pixmaps/*.gif',
-    'ui/data/pixmaps/flags/*.png',
-    'plugins/*.egg',
-    'i18n/*/LC_MESSAGES/*.mo',
-]
-_package_data['deluge.ui.web'] = [
-    'index.html',
-    'css/*.css',
-    'icons/*.png',
-    'images/*.gif',
-    'images/*.png',
-    'js/*.js',
-    'js/extjs/*.js',
-    'render/*.html',
-    'themes/css/*.css',
-    'themes/images/*/*.gif',
-    'themes/images/*/*.png',
-    'themes/images/*/*/*.gif',
-    'themes/images/*/*/*.png',
-]
-_package_data['deluge.ui.gtk3'] = ['glade/*.ui']
-
-setup_requires = ['setuptools', 'wheel']
-install_requires = [
-    "twisted[tls]>=17.1; sys_platform != 'win32'",
-    "twisted[tls]<23,>=17.1; sys_platform == 'win32'",
-    # Add pyasn1 for setuptools workaround:
-    #   https://github.com/pypa/setuptools/issues/1510
-    'pyasn1',
-    'rencode',
-    'pyopenssl',
-    'pyxdg',
-    'mako',
-    'setuptools',
-    "pywin32; sys_platform == 'win32'",
-    "certifi; sys_platform == 'win32'",
-    'zope.interface',
-]
-extras_require = {
-    'all': [
-        'setproctitle',
-        'pillow',
-        'chardet',
-        'ifaddr',
-    ]
-}
-
 # Main setup
 setup(
-    name='deluge',
-    version=_version,
-    fullname='Deluge BitTorrent Client',
-    description='BitTorrent Client',
-    author='Deluge Team',
-    maintainer='Calum Lind',
-    maintainer_email='calumlind+deluge@gmail.com',
-    keywords='torrent bittorrent p2p fileshare filesharing',
-    long_description=open('README.md').read(),
-    long_description_content_type='text/markdown',
-    url='https://deluge-torrent.org',
-    project_urls={
-        'GitHub (mirror)': 'https://github.com/deluge-torrent/deluge',
-        'Sourcecode': 'http://git.deluge-torrent.org/deluge',
-        'Issues': 'https://dev.deluge-torrent.org/report/1',
-        'Discussion': 'https://forum.deluge-torrent.org',
-        'Documentation': 'https://deluge.readthedocs.io',
-    },
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Environment :: Web Environment',
-        'Environment :: X11 Applications :: GTK',
-        'Framework :: Twisted',
-        'Intended Audience :: End Users/Desktop',
-        (
-            'License :: OSI Approved :: '
-            'GNU General Public License v3 or later (GPLv3+)'
-        ),
-        'Programming Language :: Python',
-        'Operating System :: MacOS :: MacOS X',
-        'Operating System :: Microsoft :: Windows',
-        'Operating System :: POSIX',
-        'Topic :: Internet',
-    ],
-    python_requires='>=3.6',
-    license='GPLv3+',
     cmdclass=cmdclass,
-    setup_requires=setup_requires,
-    install_requires=install_requires,
-    extras_require=extras_require,
-    data_files=_data_files,
-    package_data=_package_data,
-    exclude_package_data=_exclude_package_data,
-    packages=find_packages(exclude=['deluge.plugins.*', 'deluge.tests']),
     entry_points=_entry_points,
+    data_files=_data_files,
 )
