@@ -226,7 +226,7 @@ COMMON = """from __future__ import unicode_literals
 
 import os.path
 
-from pkg_resources import resource_filename
+from deluge.common import resource_filename
 
 
 def get_resource(filename):

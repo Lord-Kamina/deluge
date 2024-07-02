@@ -33,9 +33,9 @@ classifiers=[
 	'Operating System :: POSIX',
 	'Topic :: Internet'
 ]
-requires-python='>=3.7'
+requires-python='>=3.8'
 license={file = 'LICENSE' }
-dynamic = ["version", "readme", "dependencies", "entry-points", "scripts", "gui-scripts"]
+dynamic = ["version", "readme", "dependencies", "optional-dependencies", "entry-points", "scripts", "gui-scripts"]
 
 [project.urls]
 Homepage='https://deluge-torrent.org'
@@ -60,6 +60,7 @@ deluge = [
     'ui/data/pixmaps/*.gif',
     'ui/data/pixmaps/flags/*.png',
     'plugins/*.egg',
+    'plugins/*.whl',
     'i18n/*/LC_MESSAGES/*.mo'
     ]
 "deluge.ui.web" = [

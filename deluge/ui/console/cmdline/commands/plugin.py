@@ -48,7 +48,7 @@ class Command(BaseCommand):
             help=_('Reload list of available plugins'),
         )
         parser.add_argument(
-            '-i', '--install', help=_('Install a plugin from an .egg file')
+            '-i', '--install', help=_('Install a plugin from an .egg or .whl file')
         )
 
     def handle(self, options):
@@ -136,5 +136,5 @@ class Command(BaseCommand):
 
     def complete(self, line):
         return component.get('ConsoleUI').tab_complete_path(
-            line, ext='.egg', sort='name', dirs_first=-1
+            line, ext=('.egg', '.whl'), sort='name', dirs_first=-1
         )

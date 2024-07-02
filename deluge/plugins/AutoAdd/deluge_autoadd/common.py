@@ -13,7 +13,7 @@
 
 import os.path
 
-from pkg_resources import resource_filename
+from deluge.common import resource_filename
 
 
 def get_resource(filename, subdir=False):
