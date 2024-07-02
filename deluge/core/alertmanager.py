@@ -175,7 +175,7 @@ class AlertManager(component.Component):
                 d = task.deferLater(reactor, 0, handler, alert)
                 on_handler_timeout = partial(
                     self.on_delayed_call_timeout,
-                    handler=handler.__qualname__,
+                    handler=handler.__class__.__qualname__,
                     alert_type=alert_type,
                 )
                 d.addTimeout(
