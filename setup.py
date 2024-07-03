@@ -18,7 +18,7 @@ from setuptools import Command, setup
 from setuptools.command.build import build as _build
 from setuptools.command.test import test as _test
 
-from build import ProjectBuilder
+from build import ProjectBuilder  # isort:skip
 
 sys.path.append(os.path.dirname(__file__))
 import msgfmt
