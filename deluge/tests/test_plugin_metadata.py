@@ -6,10 +6,25 @@
 # See LICENSE for more details.
 #
 
+from unittest import mock
+
 from deluge.pluginmanagerbase import PluginManagerBase
+
+from . import common
 
 
 class TestPluginManagerBase:
+    def test_scan_for_plugins(self):
+        plugin_dirs_mock = mock.Mock(
+            return_value=common.TestPluginManager.get_plugin_dirs(self)
+        )
+        with mock.patch(
+            'deluge.tests.test_plugin_metadata.PluginManagerBase.get_plugin_dirs',
+            new=plugin_dirs_mock,
+        ):
+            pm = PluginManagerBase('core.conf', 'deluge.plugin.core')
+            assert 'plugin_resources_test' in pm.available_plugins
+
     def test_get_plugin_info(self):
         pm = PluginManagerBase('core.conf', 'deluge.plugin.core')
         for p in pm.get_available_plugins():
