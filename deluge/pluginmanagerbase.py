@@ -115,7 +115,7 @@ class PluginManagerBase:
 
         plugin_dirs = [str(f) for f in plugin_wheels + plugin_eggs if os.path.isfile(f)]
         plugin_dirs.extend([base_dir, user_dir] + base_subdir)
-        sys.path.extend(plugin_dirs)
+        [sys.path.append(item) for item in plugin_dirs if item not in sys.path]
         plugin_eps = entry_points(group=self.entry_name)
         self.available_plugins = []
         for ep in plugin_eps:
