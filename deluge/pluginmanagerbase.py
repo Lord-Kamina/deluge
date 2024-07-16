@@ -97,8 +97,8 @@ class PluginManagerBase:
         """Returns a list of enabled plugins"""
         return list(self.plugins)
 
-    def scan_for_plugins(self):
-        """Scans for available plugins"""
+    def get_plugin_dirs(self):
+        """Returns a list comprising plugin folders, as well as plugin wheels and eggs"""
         base_dir = deluge.common.resource_filename('deluge', 'plugins')
         user_dir = os.path.join(deluge.configmanager.get_config_dir(), 'plugins')
         base_subdir = [
@@ -107,7 +107,6 @@ class PluginManagerBase:
             if os.path.isdir(os.path.join(base_dir, f))
         ]
         plugin_dirs = [base_dir, user_dir] + base_subdir
-
         plugin_wheels = list(Path(base_dir).glob('*.whl'))
         plugin_wheels.extend(list(Path(user_dir).glob('*.whl')))
         plugin_eggs = list(Path(base_dir).glob('*.egg'))
@@ -115,6 +114,11 @@ class PluginManagerBase:
 
         plugin_dirs = [str(f) for f in plugin_wheels + plugin_eggs if os.path.isfile(f)]
         plugin_dirs.extend([base_dir, user_dir] + base_subdir)
+        return plugin_dirs
+
+    def scan_for_plugins(self):
+        """Scans for available plugins"""
+        plugin_dirs = self.get_plugin_dirs()
         [sys.path.append(item) for item in plugin_dirs if item not in sys.path]
         plugin_eps = entry_points(group=self.entry_name)
         self.available_plugins = []
