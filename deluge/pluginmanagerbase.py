@@ -205,7 +205,7 @@ class PluginManagerBase:
                     )
                     self.config['enabled_plugins'].append(plugin_name_space)
                 log.info('Plugin %s enabled...', plugin_name_space)
-                PluginResourceManager.prepare_for(plugin_name_space)
+                PluginResourceManager.prepare_for(instance.__module__)
                 return True
 
             def on_started_error(result, instance):
@@ -244,6 +244,7 @@ class PluginManagerBase:
             return defer.succeed(True)
 
         try:
+            module_name = self.plugins[name].__module__
             d = defer.maybeDeferred(self.plugins[name].disable)
         except Exception as ex:
             log.error('Error when disabling plugin: %s', self.plugin._component_name)
@@ -267,7 +268,7 @@ class PluginManagerBase:
                 ret = False
             else:
                 log.info('Plugin %s disabled...', name)
-            PluginResourceManager.clear_for(name)
+            PluginResourceManager.clear_for(module_name)
             return ret
 
         d.addBoth(on_disabled)
