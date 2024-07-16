@@ -25,3 +25,6 @@ RELEASE-VERSION
 /.eggs
 _pytest_temp/
 *.whl
+
+# include the dummy plug-in used for PluginResourceManager tests.
+!plugin_resources_test-*.whl

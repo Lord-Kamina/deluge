@@ -9,6 +9,7 @@
 import os
 import sys
 import traceback
+from pathlib import Path
 
 import pytest
 import pytest_twisted
@@ -16,11 +17,13 @@ from twisted.internet import defer, protocol, reactor
 from twisted.internet.defer import Deferred
 from twisted.internet.error import CannotListenError
 
+import deluge.component as component
 import deluge.configmanager
 import deluge.core.preferencesmanager
 import deluge.log
 from deluge.common import get_localhost_auth
 from deluge.error import DelugeError
+from deluge.pluginmanagerbase import PluginManagerBase
 from deluge.ui.client import Client
 
 # This sets log level to critical, so use log.critical() to debug while running unit tests
@@ -64,6 +67,66 @@ def add_watchdog(deferred, timeout=0.05, message=None):
     deferred.addBoth(callback)
     watchdog = reactor.callLater(timeout, defer.Deferred.addTimeout, deferred)
     return watchdog
+
+
+@pytest.mark.usefixtures('config_dir')
+class TestPluginManager(PluginManagerBase, component.Component):
+    """For testing the PluginManager and PluginResourceManager."""
+
+    def __init__(self, core):
+        component.Component.__init__(self, 'TestPluginManager')
+
+        self.status_fields = {}
+
+        # Call the PluginManagerBase constructor
+        PluginManagerBase.__init__(self, 'core.conf', 'deluge.plugin.core')
+
+    def start(self):
+        # Enable plugins that are enabled in the config
+        self.enable_plugins()
+
+    def stop(self):
+        # Disable all enabled plugins
+        self.disable_plugins()
+
+    def shutdown(self):
+        self.stop()
+
+    def get_plugin_dirs(self):
+        basedir = get_test_data_file('')
+        test_plugin_wheels = list(Path(basedir).glob('*.whl'))
+        plugin_dir = [basedir] + [str(i) for i in test_plugin_wheels]
+        return plugin_dir
+
+    def update_plugins(self):
+        for plugin in self.plugins:
+            if hasattr(self.plugins[plugin], 'update'):
+                try:
+                    self.plugins[plugin].update()
+                except Exception as ex:
+                    deluge.log.critical(ex)
+
+    def enable_plugin(self, name):
+        d = defer.succeed(True)
+        if name not in self.plugins:
+            d = PluginManagerBase.enable_plugin(self, name)
+
+            def on_enable_plugin(result):
+                return result
+
+            d.addBoth(on_enable_plugin)
+        return d
+
+    def disable_plugin(self, name):
+        d = defer.succeed(True)
+        if name in self.plugins:
+            d = PluginManagerBase.disable_plugin(self, name)
+
+            def on_disable_plugin(result):
+                return result
+
+            d.addBoth(on_disable_plugin)
+        return d
 
 
 class ReactorOverride:
