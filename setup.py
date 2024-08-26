@@ -538,8 +538,10 @@ _package_data['deluge.ui.gtk3'] = ['glade/*.ui']
 
 setup_requires = ['setuptools', 'wheel']
 install_requires = [
-    "twisted[tls]>=17.1; sys_platform != 'win32'",
-    "twisted[tls]<23,>=17.1; sys_platform == 'win32'",
+    "twisted[tls] @ git+https://github.com/Lord-Kamina/twisted@8949cc15 ; sys_platform != 'win32' and python_version >= '3.8'",
+    "twisted[tls] >17.1,<=23.8 ; sys_platform != 'win32' and python_version < '3.8'",
+    "twisted[tls]>=17.1,<23 ; python_version < '3.8' and sys_platform=='win32'",
+    "twisted[tls] @ git+https://github.com/Lord-Kamina/twisted@8949cc15 ; python_version >= '3.8' and sys_platform == 'win32'",
     # Add pyasn1 for setuptools workaround:
     #   https://github.com/pypa/setuptools/issues/1510
     'pyasn1',
