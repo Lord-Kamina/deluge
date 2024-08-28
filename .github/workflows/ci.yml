@@ -57,18 +57,18 @@ jobs:
           TESTSSL_URL: https://codeload.github.com/drwetter/testssl.sh/tar.gz/refs/tags/v
 
       - name: Setup core dump catch and store
-        if: github.event.inputs.core-dump == '1'
+        if: ${{ always() }}
         run: |
           sudo mkdir /cores/ && sudo chmod 777 /cores/
           echo "/cores/%E.%p" | sudo tee /proc/sys/kernel/core_pattern
           ulimit -c unlimited
           sudo apt install glibc-tools
-          echo "DEBUG_PREFIX=catchsegv python -X dev -m" >> $GITHUB_ENV
+          echo "DEBUG_PREFIX=catchsegv python -vvv -X dev -m" >> $GITHUB_ENV
 
       - name: Test with pytest
         run: |
           python -c 'from deluge._libtorrent import lt; print(lt.__version__)';
-          $DEBUG_PREFIX pytest -v --full-trace --showlocals -m "not (todo or security)" deluge
+          $DEBUG_PREFIX pytest -v --full-trace --showlocals -m "not (todo or security)" deluge 2>&1
 
       - uses: actions/upload-artifact@v4
         # capture all crashes as build artifacts
@@ -126,4 +126,4 @@ jobs:
         run: |
           python -c 'import libtorrent as lt; print(lt.__version__)';
           python -c 'from twisted.internet import gireactor; reactor = gireactor.install()'
-          python -v -c "import pytest; retcode = pytest.main(['--full-trace','--showlocals','-vvv','-ra','-m \'not (todo or security)\'','deluge']); print(f'pytest returned: {retcode}')"; 
+          python -v -c -X dev "import pytest; retcode = pytest.main(['--full-trace','--showlocals','-vvv','-ra','-m \'not (todo or security)\'','deluge']); print(f'pytest returned: {retcode}');" 2>&1 
