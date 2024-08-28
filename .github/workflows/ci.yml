@@ -42,7 +42,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install libcairo2-dev libgirepository1.0-dev
+          sudo apt-get install libcairo2-dev libgirepository1.0-dev python3-gi gir1.2-gtk-3.0 gir1.2-gdkpixbuf-2.0
           pip install --upgrade pip wheel setuptools
           pip install -r requirements-ci.txt
           pip install -e .
@@ -122,7 +122,8 @@ jobs:
           pip install -e .
 
       - name: Test with pytest
+        shell: bash
         run: |
           python -c 'import libtorrent as lt; print(lt.__version__)';
           python -c 'from twisted.internet import gireactor; reactor = gireactor.install()'
-          python -v -c "import pytest; retcode = pytest.main(['--full-trace','--showlocals','-vvv','-ra','-m "not (todo or security)"','deluge']); print(f'pytest returned: {retcode}')"; 
+          python -v -c "import pytest; retcode = pytest.main(['--full-trace','--showlocals','-vvv','-ra','-m \'not (todo or security)\'','deluge']); print(f'pytest returned: {retcode}')"; 

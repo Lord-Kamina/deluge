@@ -546,6 +546,7 @@ install_requires = [
     #   https://github.com/pypa/setuptools/issues/1510
     'pyasn1',
     'rencode',
+    'pygobject',
     'pyopenssl',
     'pyxdg',
     'mako',
