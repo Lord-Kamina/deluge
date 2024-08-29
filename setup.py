@@ -62,7 +62,7 @@ class PyTest(_test):
 
     def run_tests(self):
         import pytest
-
+        print(f"pytest args: {self.test_args}")
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 

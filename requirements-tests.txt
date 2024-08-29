@@ -1,5 +1,5 @@
 libtorrent<2.0.9
-pytest
+pytest<=8.2.2
 pytest-twisted
 pytest-cov
 mock
