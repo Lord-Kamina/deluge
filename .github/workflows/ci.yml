@@ -140,20 +140,15 @@ jobs:
           pip install --upgrade pip wheel setuptools
           pip install -r requirements-ci.txt
           pip install -e .
-
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+          limit-access-to-actor: true
       - name: Test with pytest
         shell: bash
         run: |
           python -c 'import libtorrent as lt; print(lt.__version__)';
           python -c 'from twisted.internet import gireactor; reactor = gireactor.install()'
           python -X dev -m pytest -vvv -ra --full-trace --showlocals -m "not (todo or security)" -p no:faulthandler deluge
-      - name: Start SSH session
-        uses: Lord-Kamina/debug-via-ssh@main
-        if: ${{ failure() }}
-        id: ssh_debug
-        continue-on-error: true
-        with:
-          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-          SSH_PASS: ${{ secrets.SSH_PASS }}
-          NGROK_REGION: sa
 

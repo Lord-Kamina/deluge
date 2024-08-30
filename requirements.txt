@@ -1,8 +1,8 @@
 libtorrent<2.0.9
-twisted[tls] @ git+https://github.com/Lord-Kamina/twisted@a4c0122b ; sys_platform != 'win32' and python_version >= '3.8'
+twisted[tls] @ git+https://github.com/Lord-Kamina/twisted@da989e93 ; sys_platform != 'win32' and python_version >= '3.8'
 twisted[tls] >17.1,<=23.8 ; sys_platform != 'win32' and python_version < '3.8'
 twisted[tls]>=17.1,<23 ; python_version < '3.8' and sys_platform=='win32'
-twisted[tls] @ git+https://github.com/Lord-Kamina/twisted@a4c0122b ; python_version >= '3.8' and sys_platform == 'win32'
+twisted[tls] @ git+https://github.com/Lord-Kamina/twisted@da989e93 ; python_version >= '3.8' and sys_platform == 'win32'
 rencode
 pyopenssl
 pyxdg
