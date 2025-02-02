@@ -9,26 +9,25 @@ on:
       - develop
   pull_request:
     types: [labeled, opened, synchronize, reopened]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    # Allows you to run this workflow manually from the Actions tab
     inputs:
       ref:
         description: "Enter a tag or commit to package"
-        default: ""
+        default: "develop"
       gvsbuild-tag:
         description: "Use an alternative gvsbuild release for the windows build. Defaults to latest."
         default: "latest"
 
 jobs:
-  windows_package:
+  windows-package:
     runs-on: windows-2022
     if: (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'package'))
     strategy:
       matrix:
         arch: [x64, x86]
         python: ["3.7", "3.10"]
-        libtorrent: [2.0.8, 1.2.19]
+        libtorrent: [2.0.7, 1.2.19]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

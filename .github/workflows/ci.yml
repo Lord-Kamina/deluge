@@ -41,8 +41,8 @@ jobs:
         run: echo "SECURITY_TESTS=True" >> $GITHUB_ENV
 
       - name: Install dependencies
+        # sudo apt-get install libcairo2-dev libgirepository1.0-1
         run: |
-          sudo apt-get install libcairo2-dev libgirepository1.0-dev
           pip install --upgrade pip wheel setuptools
           pip install -r requirements-ci.txt
           pip install -e .
