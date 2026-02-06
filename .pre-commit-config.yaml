@@ -8,22 +8,22 @@ exclude: >
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.6.4
+    rev: v0.15.0
     hooks:
       - id: ruff
         name: Chk Ruff
         args: [--fix]
       - id: ruff-format
         name: Fmt Ruff
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.8.1
     hooks:
       - id: prettier
         name: Fmt Prettier
         # Workaround to list modified files only.
         args: [--list-different]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
         name: Fix End-of-files
@@ -34,8 +34,8 @@ repos:
       - id: trailing-whitespace
         name: Fix Trailing whitespace
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
-        args: [--py37-plus]
+        args: [--py39-plus]
         stages: [manual]
