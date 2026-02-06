@@ -907,8 +907,8 @@ def get_path_size(path):
         return os.path.getsize(path)
 
     dir_size = 0
-    for p, dummy_dirs, files in os.walk(path):
-        for _file in files:
+    for p, dummy_dirs, _files in os.walk(path):
+        for _file in _files:
             filename = os.path.join(p, _file)
             dir_size += os.path.getsize(filename)
     return dir_size
