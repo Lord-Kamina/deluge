@@ -55,7 +55,7 @@ jobs:
           wget -O- $TESTSSL_URL$TESTSSL_VER | tar xz
           mv -t deluge/tests/data testssl.sh-$TESTSSL_VER/testssl.sh testssl.sh-$TESTSSL_VER/etc/;
         env:
-          TESTSSL_VER: 3.0.6
+          TESTSSL_VER: 3.2.2
           TESTSSL_URL: https://codeload.github.com/drwetter/testssl.sh/tar.gz/refs/tags/v
 
       - name: Setup core dump catch and store
