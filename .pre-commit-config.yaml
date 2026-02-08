@@ -12,6 +12,7 @@ exclude: >
       .*\.py*|
       .*\.html|
       .*\.md|
+      \.github/workflows/.*|
   )$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
