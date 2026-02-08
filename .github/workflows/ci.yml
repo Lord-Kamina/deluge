@@ -101,6 +101,15 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+          python-version: ${{ matrix.python-version }}
+
+      - uses: s-weigand/setup-conda@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install OpenSSL
+        run: |
+          conda install conda-forge::openssl==1.1.1w
 
       - name: Install GTK
         run: |
@@ -119,5 +128,11 @@ jobs:
 
       - name: Test with pytest
         run: |
+          echo "$env:CONDA_PREFIX\Library\bin"
+          echo $env:path -split ";"
+          echo "$env:CONDA_PREFIX\Library\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          echo "$env:CONDA_PREFIX\Library\lib" | Out-File -FilePath $env:GITHUB_PATH -Append
+          # python -c "import sys, os; [(print(f'\n\n[{p}]'), [print(os.path.join(r, f)) for r, _, fs in os.walk(p) for f in fs]) for p in sys.path if os.path.isdir(p)]"
+          python -c 'import sys; print(sys.path);'
           python -c 'import libtorrent as lt; print(lt.__version__)';
           uv run pytest -v -m "not (todo or gtkui or security)" deluge
