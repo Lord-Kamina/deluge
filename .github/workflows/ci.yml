@@ -129,10 +129,11 @@ jobs:
       - name: Test with pytest
         run: |
           echo "$env:CONDA_PREFIX\Library\bin"
-          echo $env:path -split ";"
           $env:PYTHONPATH += ";$env:CONDA_PREFIX\Library\bin"
           $env:PYTHONPATH += ";$env:CONDA_PREFIX\Library\lib"
-          # python -c "import sys, os; [(print(f'\n\n[{p}]'), [print(os.path.join(r, f)) for r, _, fs in os.walk(p) for f in fs]) for p in sys.path if os.path.isdir(p)]"
-          python -c 'import sys; print(sys.path);'
-          python -c 'import libtorrent as lt; print(lt.__version__)';
-          uv run pytest -v -m "not (todo or gtkui or security)" deluge
+          #[print(p) or os.add_dll_directory(p) for p in sys.path if os.path.isdir(p)];
+          python -c "import sys; print(sys.path); import libtorrent as lt; print(f'libtorrent version: {lt.__version__}')"
+          python -c "import sys, os; print(sys.path); os.add_dll_directory(r'$env:CONDA_PREFIX\Library\bin'); import libtorrent as lt; print(f'libtorrent version (after add_dll_directory): {lt.__version__}')"
+          Copy-Item -Path "$env:CONDA_PREFIX\Library\bin\libcrypto*.dll" -Destination "$env:SYSTEMROOT\system32" -Verbose
+          Copy-Item -Path "$env:CONDA_PREFIX\Library\bin\libssl*.dll" -Destination "$env:SYSTEMROOT\system32" -Verbose
+          python -m pytest -v -m "not (todo or gtkui or security)" deluge
