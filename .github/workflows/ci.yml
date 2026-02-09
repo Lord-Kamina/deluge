@@ -130,8 +130,8 @@ jobs:
         run: |
           echo "$env:CONDA_PREFIX\Library\bin"
           echo $env:path -split ";"
-          echo "$env:CONDA_PREFIX\Library\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
-          echo "$env:CONDA_PREFIX\Library\lib" | Out-File -FilePath $env:GITHUB_PATH -Append
+          echo "$env:CONDA_PREFIX\Library\bin" | Out-File -FilePath $env:PYTHONPATH -Append
+          echo "$env:CONDA_PREFIX\Library\lib" | Out-File -FilePath $env:PYTHONPATH -Append
           # python -c "import sys, os; [(print(f'\n\n[{p}]'), [print(os.path.join(r, f)) for r, _, fs in os.walk(p) for f in fs]) for p in sys.path if os.path.isdir(p)]"
           python -c 'import sys; print(sys.path);'
           python -c 'import libtorrent as lt; print(lt.__version__)';
