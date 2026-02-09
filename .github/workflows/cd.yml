@@ -24,13 +24,13 @@ jobs:
     strategy:
       matrix:
         arch: [x64, x86]
-        python: ["3.13", "3.9"]
+        python: ["3.9"]
         libtorrent: [2.0.11]
         include:
-          - python: 3.13
-            gvsbuild-stack: latest
           - python: 3.9
             gvsbuild-stack: older
+#          - python: 3.13
+#            gvsbuild-stack: latest
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
