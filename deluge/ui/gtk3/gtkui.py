@@ -166,7 +166,7 @@ class GtkUI:
                 self.osxapp.connect('NSApplicationWillTerminate', on_die)
                 log.debug('OSX quartz "die" handler registered')
 
-                if os.getenv('DELUGE_IS_RUNNING_BUNDLE') != "":
+                if getattr(sys, 'frozen', False):
                     launcherpath = os.path.join(os.path.dirname(sys.argv[0]), 'Deluge')
                     sys.argv[0] = launcherpath
 
@@ -187,7 +187,7 @@ class GtkUI:
         # Set language
         if self.config['language'] is not None:
             set_language(self.config['language'])
-        elif osx_check() and os.getenv('DELUGE_IS_RUNNING_BUNDLE') != "":
+        elif osx_check() and getattr(sys, 'frozen', False):
             set_language(os.getenv('LANG'))
 
         # Start the IPC Interface before anything else.. Just in case we are
