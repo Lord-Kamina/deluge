@@ -172,12 +172,20 @@ class PluginManagerBase:
                 log.error(ex)
                 return defer.succeed(False)
             except Exception as ex:
-                log.error(
-                    'Unable to instantiate plugin %r from %r!',
-                    plugin_name,
-                    ep.loader.archive,
-                )
-                log.exception(ex)
+                try:
+                    plugin_loader = find_spec(ep.module).loader
+                    log.error(
+                        'Unable to instantiate plugin %r from %r!',
+                        plugin_name,
+                        ep.loader.archive,
+                    )
+                    log.exception(ex)
+                except Exception as ex2:
+                    log.error(
+                            'Cant\'t get spec from plugin entrypoint: %r',
+                            plugin_name
+                        )
+                    log.exception(ex2)
                 continue
             try:
                 return_d = defer.maybeDeferred(instance.enable)
