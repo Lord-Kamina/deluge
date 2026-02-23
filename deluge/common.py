@@ -28,6 +28,7 @@ from importlib.metadata import version
 from importlib.resources import as_file, files
 from io import BytesIO
 from pathlib import Path
+from platformdirs import PlatformDirs
 from urllib.parse import unquote_plus, urljoin
 from urllib.request import pathname2url
 
@@ -105,29 +106,11 @@ def get_default_config_dir(filename=None):
     :rtype: string
 
     """
-
-    if windows_check():
-
-        def save_config_path(resource):
-            app_data_path = os.environ.get('APPDATA')
-            if not app_data_path:
-                import winreg
-
-                hkey = winreg.OpenKey(
-                    winreg.HKEY_CURRENT_USER,
-                    'Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders',
-                )
-                app_data_reg = winreg.QueryValueEx(hkey, 'AppData')
-                app_data_path = app_data_reg[0]
-                winreg.CloseKey(hkey)
-            return os.path.join(app_data_path, resource)
-
-    else:
-        from xdg.BaseDirectory import save_config_path
+    dirs = PlatformDirs('deluge', ensure_exists=True)
     if not filename:
         filename = ''
     try:
-        return decode_bytes(os.path.join(save_config_path('deluge'), filename))
+        return decode_bytes(os.path.join(dirs.user_config_dir, filename))
     except OSError as ex:
         log.error('Unable to use default config directory, exiting... (%s)', ex)
         sys.exit(1)
@@ -139,25 +122,8 @@ def get_default_download_dir():
     :rtype: string
 
     """
-    download_dir = ''
-    if not windows_check():
-        from xdg.BaseDirectory import xdg_config_home
-
-        try:
-            user_dirs_path = os.path.join(xdg_config_home, 'user-dirs.dirs')
-            with open(user_dirs_path, encoding='utf8') as _file:
-                for line in _file:
-                    if not line.startswith('#') and line.startswith('XDG_DOWNLOAD_DIR'):
-                        download_dir = os.path.expandvars(
-                            line.partition('=')[2].rstrip().strip('"')
-                        )
-                        break
-        except OSError:
-            pass
-
-    if not download_dir:
-        download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
-    return download_dir
+    dirs = PlatformDirs('deluge', ensure_exists=True)
+    return dirs.user_downloads_dir
 
 
 def archive_files(arc_name, filepaths, message=None, rotate=10):

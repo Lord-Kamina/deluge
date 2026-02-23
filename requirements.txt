@@ -5,7 +5,7 @@ legacy-cgi; sys_platform == 'win32' and python_version>="3.13"
 rencode
 pyopenssl
 pygobject
-pyxdg
+platformdirs
 pillow
 importlib_metadata >= 3.9; python_version<"3.10"
 mako
