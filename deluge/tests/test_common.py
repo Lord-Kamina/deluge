@@ -30,6 +30,7 @@ from deluge.common import (
     is_ipv6,
     is_magnet,
     is_url,
+    osx_check,
     parse_human_size,
     windows_check,
 )
@@ -115,6 +116,10 @@ class TestCommon:
         if windows_check():
             assert not is_interface_name('2001:db8:')
             assert not is_interface_name('{THIS0000-IS00-ONLY-FOR0-TESTING00000}')
+        elif osx_check():
+            assert is_interface_name('lo0')
+            assert not is_interface_name('127.0.0.1')
+            assert not is_interface_name('eth01101')
         else:
             assert is_interface_name('lo')
             assert not is_interface_name('127.0.0.1')
@@ -125,6 +130,11 @@ class TestCommon:
             assert is_interface('127.0.0.1')
             assert not is_interface('127')
             assert not is_interface('{THIS0000-IS00-ONLY-FOR0-TESTING00000}')
+        elif osx_check():
+            assert is_interface('lo0')
+            assert is_interface('127.0.0.1')
+            assert not is_interface('127.')
+            assert not is_interface('eth01101')
         else:
             assert is_interface('lo')
             assert is_interface('127.0.0.1')
