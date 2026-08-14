@@ -118,8 +118,9 @@ class Core(component.Component):
         settings_pack = {
             'peer_fingerprint': peer_id,
             'user_agent': user_agent,
-            'ignore_resume_timestamps': True,
         }
+        if (deluge.common.VersionSplit(LT_VERSION) < deluge.common.VersionSplit('2.1.0.0')):
+            settings_pack['ignore_resume_timestamps'] = True
         self.session = lt.session(settings_pack, flags=0)
 
         # Load the settings, if available.
