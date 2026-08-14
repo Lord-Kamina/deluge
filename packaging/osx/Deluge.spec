@@ -47,7 +47,7 @@ a = Analysis(
     hooksconfig={
     	"gi": {
     		"icons": ["Adwaita", "hicolor"],
-    		"themes": ["Mac", "WhiteSur-Light", "WhiteSur-Dark"]
+    		"themes": ["Mac", "WhiteSur-Light", "WhiteSur-Dark", "Tahoe-Light", "Tahoe-Dark"]
     	}
     },
     runtime_hooks=[os.path.join(SPECPATH, "macos_app_shims/macos_environment.py")],

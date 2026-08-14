@@ -1,6 +1,7 @@
 from platformdirs import PlatformDirs
 from pathlib import Path
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -15,6 +16,7 @@ os.environ["GTK_PATH"] = str(bundle_path / "Resources/share")
 os.environ["GI_TYPELIB_PATH"] = str(bundle_path / "Resources/gi_typelibs")
 os.environ["GDK_PIXBUF_MODULEDIR"] = str(bundle_path / "Resources/lib/gdk-pixbuf/loaders")
 os.environ["GDK_PIXBUF_MODULE_FILE"] = str(bundle_path / "Resources/lib/gdk-pixbuf/loaders.cache")
+os.environ["CRYPTOGRAPHY_OPENSSL_NO_LEGACY"] = "1"
 
 old_config_dirs = [ 
 	Path(os.path.expanduser("~/Library/Preferences/org.deluge-2.0")),
@@ -38,6 +40,11 @@ for old_config in old_config_dirs:
 		shutil.copytree(old_config / "", dirs.user_config_path,symlinks=True, ignore=exclude_paths, dirs_exist_ok=True)
 		break
 style = ""
+
+macos_version = tuple(map(int, platform.mac_ver()[0].split('.')))
+
+gtk_theme = "Tahoe" if (macos_version >= (26, 0, 0)) else "WhiteSur"
+
 defaults_proc = subprocess.run(
 	[ "defaults", "read", "-g", "AppleInterfaceStyle" ],
 	text=True,
@@ -45,7 +52,8 @@ defaults_proc = subprocess.run(
 	)
 if defaults_proc.returncode == 0:
 	style = defaults_proc.stdout.strip()
-gtk_theme = "WhiteSur-Dark" if style == "Dark" else "WhiteSur-Light"
+	
+gtk_theme += "-Dark" if style == "Dark" else "-Light"
 os.environ["GTK_THEME"] = gtk_theme
 
 defaults_proc = subprocess.run(
