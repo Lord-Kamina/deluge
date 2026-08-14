@@ -2,3 +2,4 @@ sphinx-autobuild
 tox
 pre-commit
 rjsmin
+pyinstaller>=6.20; sys_platform == 'darwin'
