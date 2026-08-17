@@ -67,7 +67,7 @@ class TestUIConsoleCommands:
         assert json_eval('["abc", "def"]') == ['abc', 'def']
         assert json_eval('{"foo": "bar"}') == {'foo': 'bar'}
         assert json_eval('{"number": 1234}') == {'number': 1234}
-        # Hex string for peer_tos.
+        # Hex string for peer_dscp.
         assert json_eval('0x00') == '0x00'
         assert json_eval('1000') == 1000
         assert json_eval('-6') == -6

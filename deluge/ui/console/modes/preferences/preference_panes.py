@@ -365,7 +365,7 @@ class NetworkPane(BasePreferencePane):
         )
 
         self.add_header('TOS', space_above=True)
-        self.add_text_input('peer_tos', 'Peer TOS Byte:', core_conf['peer_tos'])
+        self.add_text_input('peer_dscp', 'Peer TOS Byte:', core_conf['peer_dscp'])
 
         self.add_header(_('Network Extras'), space_above=True)
         self.add_checked_input('upnp', 'UPnP', core_conf['upnp'])

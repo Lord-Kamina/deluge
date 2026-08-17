@@ -120,7 +120,7 @@ DEFAULT_PREFS = {
         'force_proxy': False,
         'anonymous_mode': False,
     },
-    'peer_tos': '0x00',
+    'peer_dscp': '0x00',
     'rate_limit_ip_overhead': True,
     'geoip_db_location': '/usr/share/GeoIP/GeoIP.dat',
     'cache_size': 512,
@@ -281,9 +281,9 @@ class PreferencesManager(component.Component):
             {'outgoing_port': port, 'num_outgoing_ports': num_ports}
         )
 
-    def _on_set_peer_tos(self, key, value):
+    def _on_set_peer_dscp(self, key, value):
         try:
-            self.core.apply_session_setting('peer_tos', int(value, 16))
+            self.core.apply_session_setting('peer_dscp', int(value, 16))
         except ValueError as ex:
             log.error('Invalid tos byte: %s', ex)
 
